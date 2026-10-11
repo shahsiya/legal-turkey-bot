@@ -140,7 +140,18 @@ bot.onText(/^\/contact$/, (msg) => {
     keyboard,
   );
 });
-
+bot.on("message", (msg) => {
+  if (msg.chat.type === "supergroup") {
+    console.log(
+      "ДИАГНОСТИКА ГРУППЫ:",
+      JSON.stringify({
+        chat_id: msg.chat.id,
+        message_thread_id: msg.message_thread_id,
+        text: msg.text,
+      }),
+    );
+  }
+});
 bot.on("message", (msg) => {
   if (!msg.text || msg.text.startsWith("/")) return;
 
