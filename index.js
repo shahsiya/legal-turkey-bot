@@ -11,16 +11,98 @@ const bot = new TelegramBot(token, { polling: true });
 
 const website = "https://shahsiya.github.io/shahsiya-legal_turkey/";
 
+const serviceLinks = {
+  apostille: `${website}?service=apostille`,
+  vnj: `${website}?service=vnj`,
+  realestate: `${website}?service=realestate`,
+  notary: `${website}?service=notary`,
+  marriage: `${website}?service=marriage`,
+  business: `${website}?service=business`,
+  registration: `${website}?service=registration`,
+  taahut: `${website}?service=taahut`,
+  full: `${website}?service=full`,
+};
+
+const contactLink = `${website}#contact`;
+
 const keyboard = {
   reply_markup: {
     keyboard: [
       ["🏠 ВНЖ и гражданство"],
-      ["📄 Переводы и нотариус"],
       ["🌐 Апостиль и легализация"],
-      ["🏢 Недвижимость и бизнес"],
+      ["🏡 Недвижимость", "🏢 Бизнес-консалтинг"],
+      ["📄 Перевод и нотариус", "💍 Заключение брака"],
+      ["📍 Прописка (ikametgâh)"],
+      ["📝 Таахутнаме"],
+      ["⭐ Сопровождение под ключ"],
       ["🌍 Открыть сайт", "📞 Связаться с нами"],
     ],
     resize_keyboard: true,
+  },
+};
+
+const services = {
+  "🏠 ВНЖ и гражданство": {
+    title: "ВНЖ и гражданство",
+    description:
+      "Консультации и сопровождение по вопросам вида на жительство и гражданства в Турции.",
+    url: serviceLinks.vnj,
+  },
+
+  "🌐 Апостиль и легализация": {
+    title: "Апостиль и легализация",
+    description:
+      "Помощь с апостилем, легализацией и подготовкой документов для использования в Турции и за её пределами.",
+    url: serviceLinks.apostille,
+  },
+
+  "🏡 Недвижимость": {
+    title: "Недвижимость",
+    description:
+      "Консультационное сопровождение по вопросам недвижимости в Турции.",
+    url: serviceLinks.realestate,
+  },
+
+  "📄 Перевод и нотариус": {
+    title: "Перевод и нотариус",
+    description:
+      "Услуги перевода документов, нотариального заверения и сопровождения оформления документов.",
+    url: serviceLinks.notary,
+  },
+
+  "💍 Заключение брака": {
+    title: "Заключение брака",
+    description:
+      "Консультации по документам и процедуре заключения брака в Турции.",
+    url: serviceLinks.marriage,
+  },
+
+  "🏢 Бизнес-консалтинг": {
+    title: "Бизнес-консалтинг",
+    description:
+      "Консультации по регистрации бизнеса и административным вопросам в Турции.",
+    url: serviceLinks.business,
+  },
+
+  "📍 Прописка (ikametgâh)": {
+    title: "Прописка (ikametgâh)",
+    description:
+      "Консультации по вопросам адресной регистрации и оформления документов о месте проживания в Турции.",
+    url: serviceLinks.registration,
+  },
+
+  "📝 Таахутнаме": {
+    title: "Нотариальное обязательство (Таахутнаме)",
+    description:
+      "Информация и сопровождение по оформлению нотариального обязательства (Taahhütname).",
+    url: serviceLinks.taahut,
+  },
+
+  "⭐ Сопровождение под ключ": {
+    title: "Комплексное сопровождение «под ключ»",
+    description:
+      "Комплексное сопровождение по выбранному вопросу: от консультации и подготовки документов до прохождения необходимых процедур.",
+    url: serviceLinks.full,
   },
 };
 
@@ -29,25 +111,33 @@ bot.onText(/^\/start$/, (msg) => {
     msg.chat.id,
     "Добро пожаловать в Shahsiya Legal Turkey!\n\n" +
       "Помогаем иностранцам с документами и административными вопросами в Турции.\n\n" +
-      "Выберите интересующую вас услугу в меню ниже.",
+      "Выберите интересующую вас услугу в меню. Для каждой услуги доступна отдельная страница на нашем сайте.",
     keyboard,
   );
 });
 
 bot.onText(/^\/services$/, (msg) => {
-  bot.sendMessage(msg.chat.id, "Выберите услугу в меню ниже.", keyboard);
+  bot.sendMessage(
+    msg.chat.id,
+    "Выберите услугу из меню ниже. Вы получите описание и отдельную ссылку на соответствующий раздел сайта.",
+    keyboard,
+  );
 });
 
 bot.onText(/^\/website$/, (msg) => {
-  bot.sendMessage(msg.chat.id, `Наш сайт:\n${website}`);
+  bot.sendMessage(
+    msg.chat.id,
+    `Сайт Shahsiya Legal Turkey:\n${website}`,
+    keyboard,
+  );
 });
 
 bot.onText(/^\/contact$/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
-    "Связаться с Shahsiya Legal Turkey:\n" +
-      "Откройте наш сайт и воспользуйтесь указанными там контактами.\n" +
-      website,
+    "Связаться с Shahsiya Legal Turkey можно через контакты на сайте:\n" +
+      contactLink,
+    keyboard,
   );
 });
 
@@ -55,37 +145,33 @@ bot.on("message", (msg) => {
   if (!msg.text || msg.text.startsWith("/")) return;
 
   const chatId = msg.chat.id;
-  const text = msg.text;
+  const selectedService = services[msg.text];
 
-  const services = {
-    "🏠 ВНЖ и гражданство":
-      "Консультации по вопросам ВНЖ и гражданства в Турции.",
-    "📄 Переводы и нотариус":
-      "Услуги перевода документов, нотариального заверения и сопровождения.",
-    "🌐 Апостиль и легализация":
-      "Помощь с апостилем и легализацией документов.",
-    "🏢 Недвижимость и бизнес":
-      "Консультации по вопросам недвижимости, регистрации бизнеса и административного сопровождения.",
-  };
-
-  if (services[text]) {
+  if (selectedService) {
     bot.sendMessage(
       chatId,
-      `${services[text]}\n\nПодробности и обращение:\n${website}`,
+      `${selectedService.title}\n\n` +
+        `${selectedService.description}\n\n` +
+        `Подробнее об услуге:\n${selectedService.url}\n\n` +
+        `Связаться с нами:\n${contactLink}`,
       keyboard,
     );
     return;
   }
 
-  if (text === "🌍 Открыть сайт") {
-    bot.sendMessage(chatId, `Наш сайт:\n${website}`, keyboard);
+  if (msg.text === "🌍 Открыть сайт") {
+    bot.sendMessage(
+      chatId,
+      `Сайт Shahsiya Legal Turkey:\n${website}`,
+      keyboard,
+    );
     return;
   }
 
-  if (text === "📞 Связаться с нами") {
+  if (msg.text === "📞 Связаться с нами") {
     bot.sendMessage(
       chatId,
-      `Откройте сайт, чтобы воспользоваться контактами:\n${website}`,
+      `Контакты и способы связи:\n${contactLink}`,
       keyboard,
     );
   }
