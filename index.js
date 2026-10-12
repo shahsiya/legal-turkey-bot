@@ -106,24 +106,36 @@ const services = {
   },
 };
 
+// Приветствие в личном чате
 bot.onText(/^\/start$/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
-    "Добро пожаловать в Shahsiya Legal Turkey!\n\n" +
+    "⚖️ <b>ЮРИДИЧЕСКАЯ ПОДДЕРЖКА И ЛЕГАЛИЗАЦИЯ В ТУРЦИИ</b>\n\n" +
+      "Добро пожаловать в Shahsiya Legal Turkey!\n\n" +
       "Помогаем иностранцам с документами и административными вопросами в Турции.\n\n" +
-      "Выберите интересующую вас услугу в меню. Для каждой услуги доступна отдельная страница на нашем сайте.",
-    keyboard,
+      "📌 Выберите интересующую вас услугу в меню ниже.\n" +
+      "Подробная информация доступна на нашем сайте.",
+    {
+      ...keyboard,
+      parse_mode: "HTML",
+    },
   );
 });
 
+// Меню услуг
 bot.onText(/^\/services$/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
-    "Выберите услугу из меню ниже. Вы получите описание и отдельную ссылку на соответствующий раздел сайта.",
-    keyboard,
+    "⚖️ <b>Наши услуги</b>\n\n" +
+      "Выберите услугу из меню ниже. Вы получите описание и ссылку на соответствующий раздел сайта.",
+    {
+      ...keyboard,
+      parse_mode: "HTML",
+    },
   );
 });
 
+// Сайт
 bot.onText(/^\/website$/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
@@ -132,6 +144,7 @@ bot.onText(/^\/website$/, (msg) => {
   );
 });
 
+// Контакты
 bot.onText(/^\/contact$/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
@@ -141,6 +154,7 @@ bot.onText(/^\/contact$/, (msg) => {
   );
 });
 
+// Обработка нажатий кнопок в личном чате
 bot.on("message", (msg) => {
   if (!msg.text || msg.text.startsWith("/")) return;
 
@@ -150,11 +164,15 @@ bot.on("message", (msg) => {
   if (selectedService) {
     bot.sendMessage(
       chatId,
-      `${selectedService.title}\n\n` +
+      `<b>${selectedService.title}</b>\n\n` +
         `${selectedService.description}\n\n` +
-        `Подробнее об услуге:\n${selectedService.url}\n\n` +
-        `Связаться с нами:\n${contactLink}`,
-      keyboard,
+        `🔎 <a href="${selectedService.url}">Подробнее об услуге</a>\n\n` +
+        `📞 <a href="${contactLink}">Связаться с нами</a>`,
+      {
+        ...keyboard,
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      },
     );
     return;
   }
@@ -177,6 +195,7 @@ bot.on("message", (msg) => {
   }
 });
 
+// Каталог услуг в группе и заданной теме Telegram
 bot.onText(/\/postservices(@\w+)?/, (msg) => {
   const chatId = -1004294362025;
   const threadId = 3692;
@@ -202,17 +221,30 @@ bot.onText(/\/postservices(@\w+)?/, (msg) => {
     },
   ]);
 
+  const message =
+    "⚖️ <b>ЮРИДИЧЕСКАЯ ПОДДЕРЖКА И ЛЕГАЛИЗАЦИЯ В ТУРЦИИ</b>\n" +
+    "━━━━━━━━━━━━━━━━━━━━\n\n" +
+    "Добро пожаловать в Shahsiya Legal Turkey!\n\n" +
+    "Помогаем иностранцам с документами и административными вопросами в Турции.\n\n" +
+    "📌 <b>НАШИ УСЛУГИ</b>\n\n" +
+    "• ВНЖ и гражданство\n" +
+    "• Апостиль и легализация документов\n" +
+    "• Недвижимость и бизнес-консалтинг\n" +
+    "• Перевод и нотариальное оформление\n" +
+    "• Заключение брака и адресная регистрация\n" +
+    "• Нотариальное обязательство (Таахутнаме)\n" +
+    "• Комплексное сопровождение «под ключ»\n\n" +
+    "👇 <b>Выберите услугу с помощью кнопок ниже.</b>";
+
   bot
-    .sendMessage(
-      chatId,
-      "📋 УСЛУГИ SHAHSiYA LEGAL TURKEY\n\nВыберите интересующую услугу:",
-      {
-        message_thread_id: threadId,
-        reply_markup: {
-          inline_keyboard: keyboard,
-        },
+    .sendMessage(chatId, message, {
+      message_thread_id: threadId,
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+      reply_markup: {
+        inline_keyboard: keyboard,
       },
-    )
+    })
     .then(() => console.log("Каталог услуг опубликован в теме 3692"))
     .catch((err) => console.error("Ошибка публикации каталога:", err.message));
 });
