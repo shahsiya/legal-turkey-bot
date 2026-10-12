@@ -140,18 +140,7 @@ bot.onText(/^\/contact$/, (msg) => {
     keyboard,
   );
 });
-bot.on("message", (msg) => {
-  if (msg.chat.type === "supergroup") {
-    console.log(
-      "ДИАГНОСТИКА ГРУППЫ:",
-      JSON.stringify({
-        chat_id: msg.chat.id,
-        message_thread_id: msg.message_thread_id,
-        text: msg.text,
-      }),
-    );
-  }
-});
+
 bot.on("message", (msg) => {
   if (!msg.text || msg.text.startsWith("/")) return;
 
@@ -186,6 +175,46 @@ bot.on("message", (msg) => {
       keyboard,
     );
   }
+});
+
+bot.onText(/\/postservices(@\w+)?/, (msg) => {
+  const chatId = -1004294362025;
+  const threadId = 3692;
+
+  const services = [
+    ["ВНЖ и гражданство", "vnj"],
+    ["Апостиль и легализация", "apostille"],
+    ["Недвижимость", "realestate"],
+    ["Перевод и нотариус", "notary"],
+    ["Заключение брака", "marriage"],
+    ["Бизнес-консалтинг", "business"],
+    ["Прописка (ikametgâh)", "registration"],
+    ["Нотариальное обязательство (Таахутнаме)", "taahut"],
+    ["Комплексное сопровождение «под ключ»", "full"],
+  ];
+
+  const baseUrl = "https://shahsiya.github.io/shahsiya-legal_turkey/";
+
+  const keyboard = services.map(([name, id]) => [
+    {
+      text: name,
+      url: `${baseUrl}?service=${id}`,
+    },
+  ]);
+
+  bot
+    .sendMessage(
+      chatId,
+      "📋 УСЛУГИ SHAHSiYA LEGAL TURKEY\n\nВыберите интересующую услугу:",
+      {
+        message_thread_id: threadId,
+        reply_markup: {
+          inline_keyboard: keyboard,
+        },
+      },
+    )
+    .then(() => console.log("Каталог услуг опубликован в теме 3692"))
+    .catch((err) => console.error("Ошибка публикации каталога:", err.message));
 });
 
 bot.on("polling_error", (error) => {
